@@ -4,6 +4,7 @@
 
 import numpy
 import math
+import csv
 import matplotlib.patches as mpatches
 from matplotlib import pylab
 from PIL import Image
@@ -12,20 +13,19 @@ from skimage.filters.thresholding import threshold_otsu, threshold_isodata, thre
 from skimage.measure import label, regionprops
 from skimage.color import label2rgb
 from skimage.morphology import dilation
-from scipy.ndimage import filters
 from scipy import ndimage
 
-im = Image.open("N_sperm/DSC_0102.jpg").convert('L')
+im = Image.open("N_sperm/DSC_0464.jpg").convert('L')
 im = numpy.array(im)
 
 #remove noise
-imGaus3 = filters.gaussian_filter(im, 3)
+imGaus3 = ndimage.filters.gaussian_filter(im, 3)
 
 #edge detection
-imx = numpy.zeros(im.shape)
-filters.sobel(imGaus3,1,imx)
-imy = numpy.zeros(im.shape)
-filters.sobel(imGaus3,0,imy)
+imx = numpy.zeros(imGaus3.shape)
+ndimage.filters.sobel(imGaus3,1,imx)
+imy = numpy.zeros(imGaus3.shape)
+ndimage.filters.sobel(imGaus3,0,imy)
 edgeDetected = numpy.sqrt(imx**2+imy**2)
 
 #thresholding and closing
@@ -40,7 +40,7 @@ image_label_overlay = label2rgb(labelImage, image=filledImage)
 fig, ax = pylab.subplots(figsize=(10, 6))
 ax.imshow(image_label_overlay)
 
-with open('DSC_0102.csv', 'w') as csvfile:
+with open('DSC_0169.csv', 'w') as csvfile:
     fieldnames = ['object', 'area']
     counter = 0
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -56,6 +56,4 @@ with open('DSC_0102.csv', 'w') as csvfile:
             #counter = counter + 1
             print region.extent
         
-
-pylab.imshow(filledImage)
 pylab.show()
